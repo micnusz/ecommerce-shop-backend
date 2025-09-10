@@ -18,6 +18,14 @@ public class ProductService {
         this.productClient = productClient;
     }
 
+    public Mono<List<String>> getBrands() {
+        return productClient.getAllBrands();
+    }
+
+    public Mono<List<String>> getCategories() {
+        return productClient.getAllCategories();
+    }
+
     public Mono<PagedResponse<Product>> getProducts(
             String title,
             Double price,
@@ -39,7 +47,10 @@ public class ProductService {
                             .filter(p -> priceMax == null || p.price() <= priceMax)
                             .filter(p -> categories == null || categories.isEmpty()
                                     || categories.contains(p.category()))
-                            .filter(p -> brands == null || brands.isEmpty() || brands.contains(p.brand()))
+                            .filter(p -> brands == null || brands.isEmpty() ||
+                                    (p.brand() != null && brands.stream()
+                                            .anyMatch(b -> b.equalsIgnoreCase(p.brand()))))
+
                             .filter(p -> rating == null || p.rating().equals(rating))
                             .filter(p -> minRating == null || p.rating() >= minRating)
                             .filter(p -> maxRating == null || p.rating() <= maxRating)

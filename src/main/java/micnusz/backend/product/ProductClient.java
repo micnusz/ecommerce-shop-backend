@@ -1,5 +1,8 @@
 package micnusz.backend.product;
 
+import java.util.List;
+import java.util.Objects;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -37,4 +40,22 @@ public class ProductClient {
                 .bodyToMono(ProductApiDto.class)
                 .map(ProductMapper::toDomain);
     }
+
+    public Mono<List<String>> getAllBrands() {
+        return getAllProducts()
+                .map(paged -> paged.products().stream()
+                        .map(Product::brand)
+                        .filter(Objects::nonNull)
+                        .distinct()
+                        .toList());
+    }
+
+    public Mono<List<String>> getAllCategories() {
+        return getAllProducts()
+                .map(paged -> paged.products().stream()
+                        .map(Product::category)
+                        .distinct()
+                        .toList());
+    }
+
 }

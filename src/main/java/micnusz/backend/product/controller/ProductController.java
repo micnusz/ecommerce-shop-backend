@@ -53,4 +53,14 @@ public class ProductController {
         return productService.getProduct(id).map(ProductMapper::toResponse);
     }
 
+    @GetMapping("/brands")
+    public Mono<List<String>> getBrands() {
+        return productService.getBrands();
+    }
+
+    @GetMapping("/categories")
+    public Mono<List<String>> getCategories() {
+        return productService.getCategories();
+    }
+
 }
