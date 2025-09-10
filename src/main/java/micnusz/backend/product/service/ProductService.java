@@ -1,5 +1,7 @@
 package micnusz.backend.product.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import micnusz.backend.product.PagedResponse;
@@ -21,28 +23,33 @@ public class ProductService {
             Double price,
             Double priceMin,
             Double priceMax,
+            List<String> categories,
+            List<String> brands,
+            Integer rating,
+            Integer minRating,
+            Integer maxRating,
             Integer skip,
             Integer limit) {
         return productClient.getAllProducts()
                 .map(paged -> {
-                    // Filtrujemy produkty lokalnie
                     var filtered = paged.products().stream()
                             .filter(p -> title == null || p.title().toLowerCase().contains(title.toLowerCase()))
                             .filter(p -> price == null || p.price().equals(price))
                             .filter(p -> priceMin == null || p.price() >= priceMin)
                             .filter(p -> priceMax == null || p.price() <= priceMax)
+                            .filter(p -> categories == null || categories.isEmpty()
+                                    || categories.contains(p.category()))
+                            .filter(p -> brands == null || brands.isEmpty() || brands.contains(p.brand()))
+                            .filter(p -> rating == null || p.rating().equals(rating))
+                            .filter(p -> minRating == null || p.rating() >= minRating)
+                            .filter(p -> maxRating == null || p.rating() <= maxRating)
                             .toList();
 
-                    // Paginacja lokalna
                     int fromIndex = Math.min(skip, filtered.size());
                     int toIndex = Math.min(skip + limit, filtered.size());
                     var page = filtered.subList(fromIndex, toIndex);
 
-                    return new PagedResponse<>(
-                            page,
-                            filtered.size(), // total po filtrze
-                            skip,
-                            limit);
+                    return new PagedResponse<>(page, filtered.size(), skip, limit);
                 });
     }
 

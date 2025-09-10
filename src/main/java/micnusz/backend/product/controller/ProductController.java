@@ -1,5 +1,7 @@
 package micnusz.backend.product.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,9 +30,15 @@ public class ProductController {
             @RequestParam(required = false) Double price,
             @RequestParam(required = false) Double priceMin,
             @RequestParam(required = false) Double priceMax,
+            @RequestParam(required = false) List<String> category,
+            @RequestParam(required = false) List<String> brand,
+            @RequestParam(required = false) Integer rating,
+            @RequestParam(required = false) Integer minRating,
+            @RequestParam(required = false) Integer maxRating,
             @RequestParam(defaultValue = "0") Integer skip,
             @RequestParam(defaultValue = "20") Integer limit) {
-        return productService.getProducts(title, price, priceMin, priceMax, skip, limit)
+        return productService.getProducts(title, price, priceMin, priceMax,
+                category, brand, rating, minRating, maxRating, skip, limit)
                 .map(paged -> new PagedResponse<>(
                         paged.products().stream()
                                 .map(ProductMapper::toResponse)

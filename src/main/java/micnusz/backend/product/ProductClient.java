@@ -17,10 +17,9 @@ public class ProductClient {
         this.webClient = builder.baseUrl("https://dummyjson.com").build();
     }
 
-    // Pobieramy wszystkie produkty naraz
     public Mono<PagedResponse<Product>> getAllProducts() {
         return webClient.get()
-                .uri("/products") // ignorujemy skip/limit i sortowanie
+                .uri("/products")
                 .retrieve()
                 .bodyToMono(DummyJsonResponse.class)
                 .map(resp -> new PagedResponse<>(
@@ -29,8 +28,7 @@ public class ProductClient {
                                 .toList(),
                         resp.total(),
                         0,
-                        resp.products().size() // lokalnie będziemy paginować
-                ));
+                        resp.products().size()));
     }
 
     public Mono<Product> getProductById(Integer id) {
