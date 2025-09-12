@@ -29,7 +29,8 @@ public class ProductMapper {
                 dto.minimumOrderQuantity(),
                 dto.meta(),
                 dto.images(),
-                dto.thumbnail());
+                dto.thumbnail(),
+                generateSlug(dto.title(), dto.id()));
     }
 
     public static ProductResponseDto toResponse(Product product) {
@@ -55,6 +56,15 @@ public class ProductMapper {
                 product.minimumOrderQuantity(),
                 product.meta(),
                 product.images(),
-                product.thumbnail());
+                product.thumbnail(),
+                product.slug());
+    }
+
+    private static String generateSlug(String title, Integer id) {
+
+        String base = title.toLowerCase()
+                .replaceAll("[^a-z0-9\\s]", "")
+                .replaceAll("\\s+", "-");
+        return base + "-" + id;
     }
 }
