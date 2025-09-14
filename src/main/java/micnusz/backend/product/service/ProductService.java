@@ -29,13 +29,13 @@ public class ProductService {
     public Mono<PagedResponse<Product>> getProducts(
             String title,
             Double price,
-            Double priceMin,
-            Double priceMax,
+            Double minPrice,
+            Double maxPrice,
             List<String> categories,
             List<String> brands,
             Integer rating,
-            Integer minRating,
-            Integer maxRating,
+            Double minRating,
+            Double maxRating,
             Integer skip,
             Integer limit) {
         return productClient.getAllProducts()
@@ -43,8 +43,8 @@ public class ProductService {
                     var filtered = paged.products().stream()
                             .filter(p -> title == null || p.title().toLowerCase().contains(title.toLowerCase()))
                             .filter(p -> price == null || p.price().equals(price))
-                            .filter(p -> priceMin == null || p.price() >= priceMin)
-                            .filter(p -> priceMax == null || p.price() <= priceMax)
+                            .filter(p -> minPrice == null || p.price() >= minPrice)
+                            .filter(p -> maxPrice == null || p.price() <= maxPrice)
                             .filter(p -> categories == null || categories.isEmpty()
                                     || categories.contains(p.category()))
                             .filter(p -> brands == null || brands.isEmpty() ||

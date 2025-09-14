@@ -28,16 +28,18 @@ public class ProductController {
     public Mono<PagedResponse<ProductResponseDto>> getProducts(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) Double price,
-            @RequestParam(required = false) Double priceMin,
-            @RequestParam(required = false) Double priceMax,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
             @RequestParam(required = false) List<String> category,
             @RequestParam(required = false) List<String> brand,
             @RequestParam(required = false) Integer rating,
-            @RequestParam(required = false) Integer minRating,
-            @RequestParam(required = false) Integer maxRating,
+            @RequestParam(required = false) Double minRating,
+            @RequestParam(required = false) Double maxRating,
             @RequestParam(defaultValue = "0") Integer skip,
             @RequestParam(defaultValue = "20") Integer limit) {
-        return productService.getProducts(title, price, priceMin, priceMax,
+        return productService.getProducts(title, price,
+                minPrice,
+                maxPrice,
                 category, brand, rating, minRating, maxRating, skip, limit)
                 .map(paged -> new PagedResponse<>(
                         paged.products().stream()
