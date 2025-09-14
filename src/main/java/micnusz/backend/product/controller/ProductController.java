@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import micnusz.backend.SortField;
+import micnusz.backend.SortOrder;
 import micnusz.backend.product.PagedResponse;
 import micnusz.backend.product.dto.ProductResponseDto;
 import micnusz.backend.product.map.ProductMapper;
@@ -35,12 +37,18 @@ public class ProductController {
             @RequestParam(required = false) Integer rating,
             @RequestParam(required = false) Double minRating,
             @RequestParam(required = false) Double maxRating,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false, defaultValue = "DESC") SortOrder order,
             @RequestParam(defaultValue = "0") Integer skip,
             @RequestParam(defaultValue = "20") Integer limit) {
+
+        SortField sortField = SortField.fromString(sortBy);
+
         return productService.getProducts(title, price,
                 minPrice,
                 maxPrice,
-                category, brand, rating, minRating, maxRating, skip, limit)
+                category, brand, rating, minRating, maxRating,
+                sortField, order, skip, limit)
                 .map(paged -> new PagedResponse<>(
                         paged.products().stream()
                                 .map(ProductMapper::toResponse)

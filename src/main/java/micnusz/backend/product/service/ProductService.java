@@ -1,9 +1,13 @@
 package micnusz.backend.product.service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import micnusz.backend.SortField;
+import micnusz.backend.SortOrder;
 import micnusz.backend.product.PagedResponse;
 import micnusz.backend.product.Product;
 import micnusz.backend.product.ProductClient;
@@ -36,6 +40,8 @@ public class ProductService {
             Integer rating,
             Double minRating,
             Double maxRating,
+            SortField sortBy,
+            SortOrder order,
             Integer skip,
             Integer limit) {
         return productClient.getAllProducts()
@@ -56,12 +62,44 @@ public class ProductService {
                             .filter(p -> maxRating == null || p.rating() <= maxRating)
                             .toList();
 
-                    int fromIndex = Math.min(skip, filtered.size());
-                    int toIndex = Math.min(skip + limit, filtered.size());
-                    var page = filtered.subList(fromIndex, toIndex);
+                    var sorted = sortProducts(filtered, sortBy, order);
 
-                    return new PagedResponse<>(page, filtered.size(), skip, limit);
+                    int fromIndex = Math.min(skip, sorted.size());
+                    int toIndex = Math.min(skip + limit, sorted.size());
+                    var page = sorted.subList(fromIndex, toIndex);
+
+                    return new PagedResponse<>(page, sorted.size(), skip, limit);
                 });
+    }
+
+    private List<Product> sortProducts(List<Product> products, SortField sortBy, SortOrder order) {
+        if (sortBy == null) {
+            return products;
+        }
+
+        Comparator<Product> comparator = getComparator(sortBy);
+
+        if (order == SortOrder.DESC) {
+            comparator = comparator.reversed();
+        }
+
+        return products.stream()
+                .sorted(comparator)
+                .collect(Collectors.toList());
+    }
+
+    private Comparator<Product> getComparator(SortField sortBy) {
+        return switch (sortBy) {
+            case PRICE -> Comparator.comparing(
+                    Product::price,
+                    Comparator.nullsLast(Comparator.naturalOrder()));
+            case RATING -> Comparator.comparing(
+                    Product::rating,
+                    Comparator.nullsLast(Comparator.naturalOrder()));
+            case TITLE -> Comparator.comparing(
+                    Product::title,
+                    Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
+        };
     }
 
     public Mono<Product> getProduct(Integer id) {
